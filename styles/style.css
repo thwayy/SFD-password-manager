@@ -1,0 +1,4 @@
+button[kind="tertiary"] {
+    text-decoration: underline;
+    border: none;
+}

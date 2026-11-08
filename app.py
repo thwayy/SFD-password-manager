@@ -1,4 +1,9 @@
 import streamlit as st
+from pathlib import Path
+
+css_path = Path(__file__).parent / "styles" / "style.css"
+
+st.html(css_path)
 
 # login screen
 def login_page():
