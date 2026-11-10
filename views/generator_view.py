@@ -1,7 +1,9 @@
 import streamlit as st
-# from core.password_generator import generate_password 
+from core.password_generator import generate_password 
 def display_generator():
     st.title("Password generator")
+    # to hold the password out of order
+    password_display = st.container()
     # create slider element and store password length value
     length = st.slider("Length", min_value=4, max_value=64, value=8)
     # create checkboxes for password generation parameters
@@ -14,5 +16,7 @@ def display_generator():
     if not (use_upper or use_lower or use_numbers or use_special):
         st.warning("Pick at least one character type.")
         return None
-
-    st.code("placeholder")
+    # create and display password
+    password = generate_password(length, use_upper, use_lower, use_numbers, use_special)
+    password_display.code(password, language=None)  # has a copy button
+    return password

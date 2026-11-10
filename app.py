@@ -1,15 +1,10 @@
 import streamlit as st
-from views import login_page, register_page, vault_page
+from views import login_page, register_page, vault_page, display_generator
 from pathlib import Path
 
 css_path = Path(__file__).parent / "styles" / "style.css"
 
 st.html(css_path)
-
-
-
-
-
 
                 
 # show login screen at startup
@@ -22,5 +17,8 @@ elif st.session_state.page=="register":
         register_page()
 elif st.session_state.page=="vault":
         vault_page()
+elif st.session_state.page=="generator":
+        display_generator()
+
 
 
