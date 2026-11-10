@@ -2,8 +2,8 @@ import streamlit as st
 # register screen
 def register_page():
         st.title("Register")
-        st.text_input("Create Master Password")
-        st.text_input("Confirm Master Password")
+        st.text_input("Create Master Password", type="password")
+        st.text_input("Confirm Master Password", type="password")
         if st.button("Register"):
                 st.session_state.page="vault"
                 st.rerun()
