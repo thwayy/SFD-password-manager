@@ -1,5 +1,7 @@
 import json
 import streamlit as st
+from core.storage import save_vault
+from core.vault_actions import add_entry
 
 def vault_page():
     st.title("This is your vault.")
@@ -11,16 +13,14 @@ def vault_page():
         st.rerun()   
     # button to lock vault
     if st.button("Lock vault"):
+        st.session_state.clear()
         st.session_state.page = "login"
         st.rerun()
-
-
-    with open("vault.json", "r") as file:
-        vault = json.load(file)
 
     #button to add an entry
     if st.button("+ Add"):
         add_dialog()
+        
     # with st.form("my_form"):
     #     st.write("Inside the form")
     #     slider_val = st.slider("Form slider")
@@ -31,7 +31,8 @@ def vault_page():
     #     if submitted:
     #         st.write("slider", slider_val, "checkbox", checkbox_val)
     # st.write("Outside the form")    
-    st.data_editor(vault["entries"], disabled=["id"])
+    entries = st.session_state.vault["entries"] #get the entries dictionary from load vault
+    st.dataframe(entries)
 
 @st.dialog("Add entry",position="center") #dialog function decorator
 def add_dialog():
@@ -41,4 +42,9 @@ def add_dialog():
         password=st.text_input("Password",type="password")
         submitted = st.form_submit_button("Submit")
         if submitted:
-            st.write("Form is submitted.")
+            if not password:
+                        st.error("Password is required.")
+                        return
+            add_entry(st.session_state.vault, username, password, website )
+            save_vault(st.session_state.vault)
+            st.rerun() #close modal and show new entry
