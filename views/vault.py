@@ -19,7 +19,7 @@ def vault_page():
         vault = json.load(file)
 
     #button to add an entry
-    if st.button("Add"):
+    if st.button("+ Add"):
         add_dialog()
     # with st.form("my_form"):
     #     st.write("Inside the form")
@@ -35,4 +35,10 @@ def vault_page():
 
 @st.dialog("Add entry",position="center") #dialog function decorator
 def add_dialog():
-    st.markdown("form")
+    with st.form("add_form"):
+        website=st.text_input("Website(url)")
+        username=st.text_input("Username")
+        password=st.text_input("Password",type="password")
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            st.write("Form is submitted.")
