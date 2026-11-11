@@ -32,7 +32,7 @@ def vault_page():
     #         st.write("slider", slider_val, "checkbox", checkbox_val)
     # st.write("Outside the form")    
     entries = st.session_state.vault["entries"] #get the entries dictionary from load vault
-    st.dataframe(entries)
+    st.dataframe(entries, column_config={"id": None})
 
 @st.dialog("Add entry",position="center") #dialog function decorator
 def add_dialog():
