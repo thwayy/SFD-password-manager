@@ -2,3 +2,8 @@ button[kind="tertiary"] {
     text-decoration: underline;
     border: none;
 }
+/* delete vault button in view/vault */
+.st-key-delete_vault button {
+    text-decoration: none;       
+    color: red;
+}

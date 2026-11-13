@@ -1,5 +1,5 @@
 import streamlit as st
-from core.auth import save_vault
+from core.auth import save_vault, delete_all
 from core.vault_actions import add_entry
 from views.generator_view import display_generator
 
@@ -9,7 +9,13 @@ def vault_page():
         st.session_state.page = "login"
         st.rerun()
 
-    st.title("This is your vault.")
+    title_col, icon_col = st.columns([9, 1], vertical_alignment="center")
+    with title_col:
+        st.title("This is your vault.")
+    with icon_col:
+        if st.button("", icon=":material/delete:", type="tertiary",
+                     key="delete_vault", help="Delete vault"):
+            delete_vault_dialog()
     st.write("Your saved passwords will appear here.")
     
     # button to go to password generator
@@ -32,9 +38,9 @@ def vault_page():
 @st.dialog("Add entry",position="center") #dialog function decorator
 def add_dialog():
     with st.form("add_form"):
-        website=st.text_input("Website(url)")
-        username=st.text_input("Username")
-        password=st.text_input("Password",type="password")
+        website=st.text_input("Website (url)", placeholder="optional")
+        username=st.text_input("Username", placeholder="optional")
+        password=st.text_input("Password*",type="password", placeholder="required")
         submitted = st.form_submit_button("Submit")
         if submitted:
             if not password:
@@ -43,3 +49,12 @@ def add_dialog():
             add_entry(st.session_state.vault, username, password, website )
             save_vault(st.session_state.vault, st.session_state.key)
             st.rerun() #close modal and show new entry
+
+@st.dialog("Delete vault")
+def delete_vault_dialog():
+     st.warning("This will delete your master password and all saved passwords. This action cannot be undone.", icon=":material/warning:")
+     if st.button("Delete", key="delete_all"):
+        delete_all()
+        st.session_state.clear()
+        st.session_state.page="register"
+        st.rerun()

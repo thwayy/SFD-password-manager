@@ -147,6 +147,13 @@ def login(password):
     vault = load_vault(key)
     return key, vault
 
+### delete config.json and data.enc (the master password/account and all saved entries in vault)
+def delete_all():
+    if os.path.exists(CONFIG_FILE):
+        os.remove(CONFIG_FILE)
+    if os.path.exists(DATA_FILE):
+        os.remove(DATA_FILE)
+
 ### REGISTER / LOGIN
 
 # FIRST RUN: MASTER PASSWORD SALTS AUTH HASH EMPTY ENCRYPTED VAULT
