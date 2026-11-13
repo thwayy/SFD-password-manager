@@ -1,19 +1,20 @@
 import streamlit as st
 from core.auth import save_vault
 from core.vault_actions import add_entry
+from views.generator_view import display_generator
 
 def vault_page():
 # go back to login if there is no key in memory
     if "key" not in st.session_state:
         st.session_state.page = "login"
-        st.rerun()    
+        st.rerun()
+
     st.title("This is your vault.")
     st.write("Your saved passwords will appear here.")
     
     # button to go to password generator
     if st.button("Generate a password"):
-        st.session_state.page = "generator"
-        st.rerun()   
+        display_generator()  
     # button to lock vault
     if st.button("Lock vault"):
         st.session_state.clear()

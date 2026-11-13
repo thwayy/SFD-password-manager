@@ -1,7 +1,7 @@
 import streamlit as st
 from core.password_generator import generate_password 
+@st.dialog("Password generator") #show as pop-up modal
 def display_generator():
-    st.title("Password generator")
     # to hold the password out of order
     password_display = st.container()
     # create slider element and store password length value
