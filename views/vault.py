@@ -1,15 +1,15 @@
-import json
 import streamlit as st
 from core.auth import save_vault
 from core.vault_actions import add_entry
 
 def vault_page():
-    st.title("This is your vault.")
-    st.write("Your saved passwords will appear here.")
-    # go back to login if there is no key in memory
+# go back to login if there is no key in memory
     if "key" not in st.session_state:
         st.session_state.page = "login"
-        st.rerun()
+        st.rerun()    
+    st.title("This is your vault.")
+    st.write("Your saved passwords will appear here.")
+    
     # button to go to password generator
     if st.button("Generate a password"):
         st.session_state.page = "generator"

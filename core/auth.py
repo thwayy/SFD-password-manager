@@ -18,7 +18,6 @@ PBKDF2_ITERATIONS = 600_000 # 600_000 ITERATIONS (BRIEF)
 SALT_SIZE = 16 # 128 BITS FOR SALTS
 HASH_ALGORITHM = "sha256" # SHA-256 STRONG GOOD HASH USED INSIDE PBKDF2
 KEY_SIZE = 32 # FERNET NEEDS A 256-BIT KEY
-MAX_LOGIN_ATTEMPTS = 3 # MAX LOGIN ATTEMPTS BEFORE CLOSE
 MIN_PASSWORD_LENGTH = 8
 
 ### SALT HELPER FUNCTIONS
@@ -144,7 +143,6 @@ def login(password):
     if not hmac.compare_digest(attempt_hash, auth_hash):
         raise ValueError("Wrong password.")    
     # AUTH PASSED SAFE TO GET THE KEY AND OPEN THE VAULT
-    config = load_config()
     key = derive_key(password, kdf_salt)
     vault = load_vault(key)
     return key, vault
