@@ -12,6 +12,12 @@ cd SFD-password-manager
 ```
 pip install -r requirements.txt
 ```
+If pip is not found, use a virtual environment:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 ### Run the app
 ```
 streamlit run app.py
