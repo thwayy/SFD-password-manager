@@ -1,12 +1,15 @@
 import json
 import streamlit as st
-from core.storage import save_vault
+from core.auth import save_vault
 from core.vault_actions import add_entry
 
 def vault_page():
     st.title("This is your vault.")
     st.write("Your saved passwords will appear here.")
-
+    # go back to login if there is no key in memory
+    if "key" not in st.session_state:
+        st.session_state.page = "login"
+        st.rerun()
     # button to go to password generator
     if st.button("Generate a password"):
         st.session_state.page = "generator"
@@ -21,16 +24,7 @@ def vault_page():
     if st.button("+ Add"):
         add_dialog()
         
-    # with st.form("my_form"):
-    #     st.write("Inside the form")
-    #     slider_val = st.slider("Form slider")
-    #     checkbox_val = st.checkbox("Form checkbox")
-
-    #     # Every form must have a submit button.
-    #     submitted = st.form_submit_button("Submit")
-    #     if submitted:
-    #         st.write("slider", slider_val, "checkbox", checkbox_val)
-    # st.write("Outside the form")    
+   
     entries = st.session_state.vault["entries"] #get the entries dictionary from load vault
     st.dataframe(entries, column_config={"id": None})
 
@@ -46,5 +40,5 @@ def add_dialog():
                         st.error("Password is required.")
                         return
             add_entry(st.session_state.vault, username, password, website )
-            save_vault(st.session_state.vault)
+            save_vault(st.session_state.vault, st.session_state.key)
             st.rerun() #close modal and show new entry

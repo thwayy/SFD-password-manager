@@ -1,14 +1,19 @@
 import streamlit as st
-from core.storage import load_vault
+from core.auth import login
 # login screen
 def login_page():
         st.title("Login")
-        st.text_input("Master password", type="password")
+        password = st.text_input("Master password", type="password")
 
         if st.button("Login"):
-                st.session_state.vault = load_vault()
-                st.session_state.page="vault"
-                st.rerun()
+                try:
+                        key, vault = login(password)
+                        st.session_state.key = key
+                        st.session_state.vault = vault
+                        st.session_state.page="vault"
+                        st.rerun()
+                except ValueError as error:
+                        st.error(str(error))
 
         # switch to register screen
         if st.button("Don't have an account?", type="tertiary"):

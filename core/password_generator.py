@@ -1,3 +1,4 @@
+# functionality for password generator
 import secrets # to generate cryptographically secure passwords
 import string # to get characters
 

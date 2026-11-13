@@ -4,7 +4,6 @@
 # STAGE 2: SEPARATE ENCRYPTION KEY + ENCRYPTED VAULT (data.enc)
 
 import base64
-import getpass
 import hashlib
 import hmac
 import json
@@ -20,7 +19,7 @@ SALT_SIZE = 16 # 128 BITS FOR SALTS
 HASH_ALGORITHM = "sha256" # SHA-256 STRONG GOOD HASH USED INSIDE PBKDF2
 KEY_SIZE = 32 # FERNET NEEDS A 256-BIT KEY
 MAX_LOGIN_ATTEMPTS = 3 # MAX LOGIN ATTEMPTS BEFORE CLOSE
-
+MIN_PASSWORD_LENGTH = 8
 
 ### SALT HELPER FUNCTIONS
 
@@ -99,7 +98,7 @@ def save_vault(vault, key):
 # IF data.enc IS MISSING IT CREATES AN EMPTY VAULT FILE
 def load_vault(key):
     if not os.path.exists(DATA_FILE):
-        vault = {}
+        vault = {"entries":[]} #because vault page reads "entries" 
         save_vault(vault, key)
         return vault
 
@@ -111,74 +110,113 @@ def load_vault(key):
     return json.loads(plaintext.decode("utf-8"))
 
 
-### REGISTER / LOGIN
-
+### GUI FUNCTIONS
+#  for views/register
 # FIRST RUN: MASTER PASSWORD SALTS AUTH HASH EMPTY ENCRYPTED VAULT
-def register():
-    print("First time setup")
-    print("Pick a master password (at least 8 characters).")
-    password = getpass.getpass("Master password: ")
-    getpass.getpass("Confirm password: ")
+def register(password, confirm):
+    # check if config file/user account has already been created
+    if os.path.exists(CONFIG_FILE):
+        raise ValueError("An account already exists. Please log in.")
+    # check password length
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise ValueError(f"Password must be at least {MIN_PASSWORD_LENGTH} characters.")
+    if password != confirm:
+        raise ValueError("Passwords do not match. Please try again.")
     auth_salt = generate_salt()
     kdf_salt = generate_salt()
     auth_hash = hash_password(password, auth_salt)
     save_config(auth_salt, auth_hash, kdf_salt)
 
-    # EMPTY VAULT CREATED
+    # create empty vault
     key = derive_key(password, kdf_salt)
-    save_vault({}, key)
+    vault = {"entries":[]}
+    save_vault(vault, key)
+    return key, vault
 
-    print("Done. Saved config.json and an empty data.enc.")
-    return True
+### for views/login
+def login(password):
+    config = load_config()
+    if config is None:
+        raise ValueError("No account yet. Register first.")
+    auth_salt, auth_hash, kdf_salt = config
+    attempt_hash = hash_password(password, auth_salt)
+    # WHY hmac.compare_digest NOT == : AVOIDS TIMING LEAKS
+    if not hmac.compare_digest(attempt_hash, auth_hash):
+        raise ValueError("Wrong password.")    
+    # AUTH PASSED SAFE TO GET THE KEY AND OPEN THE VAULT
+    config = load_config()
+    key = derive_key(password, kdf_salt)
+    vault = load_vault(key)
+    return key, vault
+
+### REGISTER / LOGIN
+
+# FIRST RUN: MASTER PASSWORD SALTS AUTH HASH EMPTY ENCRYPTED VAULT
+# def register():
+#     print("First time setup")
+#     print("Pick a master password (at least 8 characters).")
+#     password = getpass.getpass("Master password: ")
+#     getpass.getpass("Confirm password: ")
+#     auth_salt = generate_salt()
+#     kdf_salt = generate_salt()
+#     auth_hash = hash_password(password, auth_salt)
+#     save_config(auth_salt, auth_hash, kdf_salt)
+
+#     # EMPTY VAULT CREATED
+#     key = derive_key(password, kdf_salt)
+#     save_vault({}, key)
+
+#     print("Done. Saved config.json and an empty data.enc.")
+#     return True
 
 
 # UP TO 3 TRIES
 # ON SUCCESS RETURN THE MASTER PASSWORD
 # ON FAILURE RETURN None
 # DO NOT DERIVE THE KEY OR TOUCH data.enc UNTIL AUTH PASSES
-def login():
-    config = load_config()
-    if config is None:
-        print("No config.json found — run setup first.")
-        return None
+# def login():
+#     config = load_config()
+#     if config is None:
+#         print("No config.json found — run setup first.")
+#         return None
 
-    auth_salt, auth_hash, _kdf_salt = config
+#     auth_salt, auth_hash, _kdf_salt = config
 
-    print("Login")
-    for attempt in range(1, MAX_LOGIN_ATTEMPTS + 1):
-        password = getpass.getpass(
-            f"Master password (attempt {attempt}/{MAX_LOGIN_ATTEMPTS}): "
-        )
+#     print("Login")
+#     for attempt in range(1, MAX_LOGIN_ATTEMPTS + 1):
+#         password = getpass.getpass(
+#             f"Master password (attempt {attempt}/{MAX_LOGIN_ATTEMPTS}): "
+#         )
 
-        attempt_hash = hash_password(password, auth_salt)
+#         attempt_hash = hash_password(password, auth_salt)
 
-        # WHY hmac.compare_digest NOT == : AVOIDS TIMING LEAKS
-        if hmac.compare_digest(attempt_hash, auth_hash):
-            print("You're in.")
-            return password
+#         # WHY hmac.compare_digest NOT == : AVOIDS TIMING LEAKS
+#         if hmac.compare_digest(attempt_hash, auth_hash):
+#             print("You're in.")
+#             return password
 
-        print("Wrong password.")
+#         print("Wrong password.")
 
-    print("Too many tries. Exiting.")
-    return None
+#     print("Too many tries. Exiting.")
+#     return None
 
 
 ### MENU STAGE 3 TOODOO!!!!!!
 
 # MENU AFTER LOGIN: 1 ADD  2 VIEW  3 LIST  4 DELETE  5 EXIT
-def main_menu():
-    while True:
-        print()
-        print("1. Add entry")
-        print("2. View entry")
-        print("3. List sites")
-        print("4. Delete entry")
-        print("5. Exit")
-        choice = input("Choice (1-5): ").strip()
+# def main_menu():
+#     while True:
+#         print()
+#         print("1. Add entry")
+#         print("2. View entry")
+#         print("3. List sites")
+#         print("4. Delete entry")
+#         print("5. Exit")
+#         choice = input("Choice (1-5): ").strip()
 
-        if choice == "5":
-            print("Bye.")
-            break
+#         if choice == "5":
+#             print("Bye.")
+#             break
 
 
 ### MAIN FLOW
@@ -186,24 +224,24 @@ def main_menu():
 # NO config.json -> register()
 # ELSE -> login()
 # ONLY AFTER LOGIN: derive_key() THEN load_vault() THEN main_menu()
-def main():
-    if not os.path.exists(CONFIG_FILE):
-        register()
-        print()
+# def main():
+#     if not os.path.exists(CONFIG_FILE):
+#         register()
+#         print()
 
-    password = login()
-    if password is None:
-        return
+#     password = login()
+#     if password is None:
+#         return
 
-    # AUTH PASSED SAFE TO GET THE KEY AND OPEN THE VAULT
-    config = load_config()
-    _auth_salt, _auth_hash, kdf_salt = config
-    key = derive_key(password, kdf_salt)
-    vault = load_vault(key)
+#     # AUTH PASSED SAFE TO GET THE KEY AND OPEN THE VAULT
+#     config = load_config()
+#     _auth_salt, _auth_hash, kdf_salt = config
+#     key = derive_key(password, kdf_salt)
+#     vault = load_vault(key)
 
-    print(f"Vault unlocked ({len(vault)} entries).")
-    main_menu()
+#     print(f"Vault unlocked ({len(vault)} entries).")
+#     main_menu()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
