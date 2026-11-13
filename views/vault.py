@@ -13,16 +13,16 @@ def vault_page():
     st.write("Your saved passwords will appear here.")
     
     # button to go to password generator
-    if st.button("Generate a password"):
+    if st.button("Generate a password", icon=":material/autorenew:"):
         display_generator()  
     # button to lock vault
-    if st.button("Lock vault"):
+    if st.button("Lock vault", icon=":material/lock:"):
         st.session_state.clear()
         st.session_state.page = "login"
         st.rerun()
 
     #button to add an entry
-    if st.button("+ Add"):
+    if st.button("Add", icon=":material/add:"):
         add_dialog()
         
    
