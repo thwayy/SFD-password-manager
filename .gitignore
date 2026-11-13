@@ -1,2 +1,4 @@
 config.json
 data.enc
+__pycache__/
+*.pyc
