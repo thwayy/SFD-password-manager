@@ -5,7 +5,7 @@ MAX_LOGIN_ATTEMPTS = 3
 # login screen
 def login_page():
         st.title("Login")
-        with st.form("register_form"):
+        with st.form("register_form", border=False):
                 password = st.text_input("Master password", type="password")
                 submitted = st.form_submit_button("Login")
                 if submitted:

@@ -95,7 +95,7 @@ def edit_dialog(entry):
 
 @st.dialog("Delete entry")
 def delete_dialog(entry):
-    st.write("Deleting this entry? This cannot be undone.")
+    st.write("Deleting this entry? This cannot be undone")
     if st.button("Delete", key="confirm_delete_entry"):
         delete_entry(st.session_state.vault, entry["id"])
         save_vault(st.session_state.vault, st.session_state.key)

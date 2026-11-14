@@ -3,7 +3,7 @@ from core.auth import register
 # register screen
 def register_page():
         st.title("Register")
-        with st.form("register_form"):
+        with st.form("register_form", border=False):
                 password = st.text_input("Create Master Password", type="password")
                 confirm = st.text_input("Confirm Master Password", type="password")
                 submitted = st.form_submit_button("Register")
