@@ -45,6 +45,7 @@ def vault_page():
         col1, col2, col3, col4, col5 = st.columns([3, 3, 3, 1, 1], vertical_alignment="center")
         col1.text(entry["username"])    
         col2.text(entry["password"])
+        col3.text(entry["website"]) 
         if col4.button("", icon=":material/edit:", type="tertiary",
                        key="edit_" + entry["id"], help="Edit"):
             edit_dialog(entry)
@@ -94,7 +95,7 @@ def edit_dialog(entry):
 
 @st.dialog("Delete entry")
 def delete_dialog(entry):
-    st.write("Deleting this entry? This cannot be undone")
+    st.write("Deleting this entry? This cannot be undone.")
     if st.button("Delete", key="confirm_delete_entry"):
         delete_entry(st.session_state.vault, entry["id"])
         save_vault(st.session_state.vault, st.session_state.key)
