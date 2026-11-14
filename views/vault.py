@@ -9,11 +9,11 @@ def vault_page():
         st.session_state.page = "login"
         st.rerun()
 
-    title_col, icon_col = st.columns([9, 1], vertical_alignment="center")
+    title_col, icon_col = st.columns([8, 2], vertical_alignment="center")
     with title_col:
         st.title("This is your vault.")
     with icon_col:
-        if st.button("", icon=":material/delete:", type="tertiary",
+        if st.button("Delete vault", icon=":material/delete:", type="tertiary",
                      key="delete_vault", help="Delete vault"):
             delete_vault_dialog()
     st.write("Your saved passwords will appear here.")
