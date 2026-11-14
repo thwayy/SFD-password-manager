@@ -18,6 +18,10 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
+If you get "streamlit is not recognized" or "command not found", use:
+```
+python -m streamlit run app.py
+```
 ### Run the app
 ```
 streamlit run app.py
