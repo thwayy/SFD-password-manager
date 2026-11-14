@@ -11,3 +11,21 @@ def add_entry(vault, username, password, website):
                 "website":website
         }
         vault["entries"].append(new_entry)
+
+
+# change existing entry 
+def edit_entry(vault, entry_id, username, password, website):
+        for entry in vault["entries"]:
+                if entry["id"]==entry_id:
+                        entry["username"]=username
+                        entry["password"]=password
+                        entry["website"]=website
+
+
+# remove an entry
+def delete_entry(vault, entry_id):
+        for entry in vault["entries"]:
+                if entry["id"]==entry_id:
+                        vault["entries"].remove(entry)
+                        return
+
